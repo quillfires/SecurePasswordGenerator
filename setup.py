@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "securepasswordgenerator",
-    version = "1.0.1",
+    version = "2.0.0",
     author = "Ali Fayaz (Quill)",
     author_email = "fayaz.quill@gmail.com",
     description = ("SecurePasswordGenerator is a tool for generating random passwords. It provides both command line utility and underlying python module."),
@@ -30,6 +30,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
         "Development Status :: 5 - Production/Stable"

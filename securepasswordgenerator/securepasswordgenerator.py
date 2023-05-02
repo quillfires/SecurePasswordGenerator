@@ -24,32 +24,43 @@ SOFTWARE.
 """
 
 import argparse
-from random import SystemRandom
+import secrets
 import string
 
 
-def generate(length = 8,
-             use_lower_case = True,
-             use_upper_case = True,
-             use_numbers = True,
-             use_special = False,
-             use_hex = False):
-    """
-    Normal Passwords - Default Passwords 8 characters with Upper case, Lower case and Numbers.
-    """
-    characters = ""
-    saferand = SystemRandom()
+def generate_password(length=8, use_lower_case=True, use_upper_case=True, use_numbers=True, use_special=True, use_hex=False):
+    characters = []
     if use_lower_case:
-        characters += string.ascii_lowercase
+        characters.extend(string.ascii_lowercase)
     if use_upper_case:
-        characters += string.ascii_uppercase
+        characters.extend(string.ascii_uppercase)
     if use_numbers:
-        characters += string.digits
+        characters.extend(string.digits)
     if use_special:
-        characters += string.punctuation
+        characters.extend(string.punctuation)
     if use_hex:
-        characters += "123456789ABCDEF"
-    password = "".join(saferand.choice(characters) for i in range(length))
+        characters.extend("123456789ABCDEF")
+    return "".join(secrets.choice(characters) for _ in range(length))
+
+
+def generate(length=8, use_lower_case=True, use_upper_case=True, use_numbers=True, use_special=True, use_hex=False):
+    """
+    Generate Normal Passwords - 8 characters that includes atleast 1 uppercase, 1 lower case, 1 special character and 1 number.
+    """
+    password = ""
+    if length > 1000:
+        print("ERROR: Requested password length is too large, please choose a reasonable value.")
+        return
+    if length > 4:
+        while not password_checker(password, string.ascii_lowercase if use_lower_case else password) \
+                or not password_checker(password, string.ascii_uppercase if use_upper_case else password) \
+                or not password_checker(password, string.digits if use_numbers else password) \
+                or not password_checker(password, string.punctuation if use_special else password) \
+                or not password_checker(password, "123456789ABCDEF" if use_hex else password):
+            password = generate_password(length, use_lower_case, use_upper_case, use_numbers, use_special, use_hex)
+    else:
+        password = generate_password(length, use_lower_case, use_upper_case, use_numbers, use_special, use_hex)
+
     return password
 
 
@@ -57,7 +68,7 @@ def decent():
     """
     Generate Memorable Passwords - Perfect for securing your computer or mobile device, or somewhere brute force is detectable.
     """
-    password = generate(10, True, True, True, False, False)
+    password = generate_password(10, True, True, True, False, False)
     return password
 
 
@@ -65,7 +76,7 @@ def strong():
     """
     Generate Strong Passwords - Robust enough to keep your web hosting account secure.
     """
-    password = generate(15, True, True, True, True, False)
+    password = generate_password(15, True, True, True, True, False)
     return password
 
 
@@ -73,7 +84,7 @@ def fort_knox():
     """
     Generate Fort Knox Passwords - Secure enough for almost anything, like root or administrator passwords.
     """
-    password = generate(30, True, True, True, True, False)
+    password = generate_password(30, True, True, True, True, False)
     return password
 
 
@@ -81,7 +92,7 @@ def ci_key():
     """
     Generate CodeIgniter Encryption Keys - Can be used for any other 256-bit key requirement.
     """
-    password = generate(32, True, True, True, False, False)
+    password = generate_password(32, True, True, True, False, False)
     return password
 
 
@@ -89,7 +100,7 @@ def wpa_160():
     """
     Generate 160-bit WPA Key
     """
-    password = generate(20, True, True, True, True, False)
+    password = generate_password(20, True, True, True, True, False)
     return password
 
 
@@ -97,7 +108,7 @@ def wpa_504():
     """
     Generate 504-bit WPA Key
     """
-    password = generate(63, True, True, True, True, False)
+    password = generate_password(63, True, True, True, True, False)
     return password
 
 
@@ -105,7 +116,7 @@ def wep_64():
     """
     Generate 64-bit WEP Keys
     """
-    password = generate(5, False, False, False, False, True)
+    password = generate_password(5, False, False, False, False, True)
     return password
 
 
@@ -113,7 +124,7 @@ def wep_128():
     """
     Generate 128-bit WEP Keys
     """
-    password = generate(13, False, False, False, False, True)
+    password = generate_password(13, False, False, False, False, True)
     return password
 
 
@@ -121,7 +132,7 @@ def wep_152():
     """
     Generate 152-bit WEP Keys
     """
-    password = generate(16, False, False, False, False, True)
+    password = generate_password(16, False, False, False, False, True)
     return password
 
 
@@ -129,126 +140,60 @@ def wep_256():
     """
     Generate 256-bit WEP Keys
     """
-    password = generate(29, False, False, False, False, True)
+    password = generate_password(29, False, False, False, False, True)
     return password
+
+
+def password_checker(password, requirement):
+    return any(char in password for char in requirement)
 
 
 def main():
     parser = argparse.ArgumentParser(description="The Secure Password or Keygen Generator")
-    parser.add_argument("length", nargs="?", default=8, action="store",
-                        help="Length of password (default is 8 characters)")
-    parser.add_argument("-l", "--lower-enable", dest="use_lower_case", default=True, action="store_true",
-                        help="Use lowercase characters")
-    parser.add_argument("-L", "--lower-disable", dest="use_lower_case", default=False, action="store_false",
-                        help="Don't use lowercase characters")
-    parser.add_argument("-u", "--upper-enable", dest="use_upper_case", default=True, action="store_true", 
-                        help="use upper case characters")
-    parser.add_argument("-U", "--upper-disable", dest="use_upper_case", default=False, action="store_false", 
-                        help="don't use upper case characters")
-    parser.add_argument("-n", "--number-enable", dest="use_numbers", default=True, action="store_true", 
-                        help="use number characters")
-    parser.add_argument("-N", "--number-disable", dest="use_numbers", default=False, action="store_false", 
-                        help="don't use number characters")
-    parser.add_argument("-s", "--special-enable", dest="use_special", default=False, action="store_true", 
-                        help="use special characters")
-    parser.add_argument("-S", "--special-disable", dest="use_special", default=True, action="store_false", 
-                        help="don't use special characters")
-    parser.add_argument("-x", "--hex-enable", dest="use_hex", default=False, action="store_true", 
-                        help="use hex characters")
-    parser.add_argument("-X", "--hex-disable", dest="use_hex", default=True, action="store_false", 
-                        help="don't use hex characters")
-    parser.add_argument("-DP", "--decent", dest="decent", default=False, action="store_true", 
-                        help="Generate Memorable Passwords - Perfect for securing your computer or mobile device, or somewhere brute force is detectable.")
-    parser.add_argument("-SP", "--strong", dest="strong", default=False, action="store_true", 
-                        help="Generate Strong Passwords - Robust enough to keep your web hosting account secure.")
-    parser.add_argument("-FP", "--fort_knox", dest="fort_knox", default=False, action="store_true", 
-                        help="Generate Fort Knox Passwords - Secure enough for almost anything, like root or administrator passwords.")
-    parser.add_argument("-ci", "--ci_key", dest="ci_key", default=False, action="store_true", 
-                        help="Generate CodeIgniter Encryption Keys - Can be used for any other 256-bit key requirement.")
-    parser.add_argument("-wpa160", "--wpa_160", dest="wpa_160", default=False, action="store_true", 
-                        help="Generate 160-bit WPA Key")
-    parser.add_argument("-wpa504", "--wpa_504", dest="wpa_504", default=False, action="store_true", 
-                        help="Generate 504-bit WPA Key")
-    parser.add_argument("-wep64", "--wep_64", dest="wep_64", default=False, action="store_true", 
-                        help="Generate 64-bit WEP Keys")
-    parser.add_argument("-wep128", "--wep_128", dest="wep_128", default=False, action="store_true", 
-                        help="Generate 128-bit WEP Keys")
-    parser.add_argument("-wep152", "--wep_152", dest="wep_152", default=False, action="store_true", 
-                        help="Generate 152-bit WEP Keys")
-    parser.add_argument("-wep256", "--wep_256", dest="wep_256", default=False, action="store_true", 
-                        help="Generate 256-bit WEP Keys")
+    parser.add_argument("length", nargs="?", type=int, default=8, help="Length of password (default is 8 characters)")
+    parser.add_argument("-l", "--lower-case", action="store_true", help="Use lowercase characters")
+    parser.add_argument("-u", "--upper-case", action="store_true", help="Use uppercase characters")
+    parser.add_argument("-n", "--numbers", action="store_true", help="Use numbers")
+    parser.add_argument("-s", "--special", action="store_true", help="Use special characters")
+    parser.add_argument("-x", "--hex", action="store_true", help="Use hex characters")
+    parser.add_argument("-p", "--password-strength", choices=["decent", "strong", "fort_knox", "wpa_160", "wpa_504", "wep_64", "wep_128", "wep_152", "wep_256"], help="Generate a password with a predefined strength")
     args = parser.parse_args()
-    
-    if args.length is None:
-        length = 8
+
+    if args.password_strength:
+        length, use_lower_case, use_upper_case, use_numbers, use_special, use_hex = {
+            "decent": (10, True, True, True, False, False),
+            "strong": (15, True, True, True, True, False),
+            "fort_knox": (30, True, True, True, True, False),
+            "wpa_160": (20, True, True, True, True, False),
+            "wpa_504": (63, True, True, True, True, False),
+            "wep_64": (5, False, False, False, False, True),
+            "wep_128": (13, False, False, False, False, True),
+            "wep_152": (16, False, False, False, False, True),
+            "wep_256": (29, False, False, False, False, True)
+        }[args.password_strength]
+        password = generate_password(length, use_lower_case, use_upper_case, use_numbers, use_special, use_hex)
     else:
-        try:
-            length = int(args.length)
-        except ValueError:
-            print(f"Error: Input length '{args.length}' is not a valid number")
+        if not args.lower_case and not args.upper_case and not args.numbers and not args.special and not args.hex:
+            args.length=8
+            args.lower_case=True
+            args.upper_case=True
+            args.numbers=True
+            args.special=True
+            args.hex=False
+        password = ""
+        if args.length > 1000:
+            print("ERROR: Requested password length is too large, please choose a reasonable value.")
             return
-    
-    if args.decent:
-        password = decent()
-        print(password)
-        return
-    
-    if args.strong:
-        password = strong()
-        print(password)
-        return
-    
-    if args.fort_knox:
-        password = fort_knox()
-        print(password)
-        return
-    
-    if args.ci_key:
-        password = ci_key()
-        print(password)
-        return
-    
-    if args.wpa_160:
-        password = wpa_160()
-        print(password)
-        return
-    
-    if args.wpa_504:
-        password = wpa_504()
-        print(password)
-        return
-    
-    if args.wep_64:
-        password = wep_64()
-        print(password)
-        return
-    
-    if args.wep_128:
-        password = wep_128()
-        print(password)
-        return
-    
-    if args.wep_152:
-        password = wep_152()
-        print(password)
-        return
-    
-    if args.wep_256:
-        password = wep_256()
-        print(password)
-        return
-    
-    if not args.use_lower_case and not args.use_upper_case and not args.use_numbers and not args.use_special and not args.hex:
-        print("You have disabled all supported character sets. You must enable " + \
-                "at least one of the character sets to generate a password.")
-        return
-    
-    password = generate(length=length,
-                        use_lower_case = args.use_lower_case,
-                        use_upper_case = args.use_upper_case,
-                        use_numbers = args.use_numbers,
-                        use_special = args.use_special,
-                        use_hex = args.use_hex)
+        if args.length > 4:
+            while not password_checker(password, string.ascii_lowercase if args.lower_case else password) \
+                    or not password_checker(password, string.ascii_uppercase if args.upper_case else password) \
+                    or not password_checker(password, string.digits if args.numbers else password) \
+                    or not password_checker(password, string.punctuation if args.special else password) \
+                    or not password_checker(password, "123456789ABCDEF" if args.hex else password):
+                password = generate_password(args.length, args.lower_case, args.upper_case, args.numbers, args.special, args.hex)
+        else:
+            password = generate_password(args.length, args.lower_case, args.upper_case, args.numbers, args.special, args.hex)
+
     print(password)
 
 
